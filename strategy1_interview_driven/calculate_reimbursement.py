@@ -21,7 +21,7 @@ def calculate_reimbursement(trip_duration_days, miles_traveled, total_receipts_a
 
     # Rule for Receipts (Initial - direct pass-through)
     # Diminishing returns, penalties, and quirks will be added iteratively.
-    receipt_reimbursement = total_receipts_amount
+    receipt_reimbursement = total_receipts_amount * 0.20  # Initial guess for percentage-based reimbursement
 
     total_reimbursement = per_diem_reimbursement + mileage_reimbursement + receipt_reimbursement
 
