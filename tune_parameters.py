@@ -21,9 +21,11 @@ PUBLIC_CASES_JSON_PATH = os.path.join(SCRIPT_DIR, "public_cases.json")
 # Define parameter ranges for random search [min, max, type ('float' or 'int')]
 PARAMETER_RANGES = {
     "per_diem_rate": [70.00, 130.00, 'float'],
-    "mileage_tier1_threshold_miles": [500.0, 1500.0, 'float'],
-    "mileage_tier1_rate": [0.40, 0.80, 'float'],
-    "mileage_tier2_rate": [0.30, 0.70, 'float'],
+    "mileage_t1_threshold_miles": [80.0, 150.0, 'float'],
+    "mileage_t1_rate": [0.50, 0.70, 'float'],
+    "mileage_t2_threshold_miles": [300.0, 700.0, 'float'],
+    "mileage_t2_rate": [0.20, 0.40, 'float'],
+    "mileage_t3_rate": [0.10, 0.30, 'float'],
     "receipt_reimbursement_rate": [0.10, 0.50, 'float'],
     "five_day_trip_bonus_amount": [0.00, 100.00, 'float'],
     "mileage_efficiency_threshold_miles_per_day": [100.0, 400.0, 'float'],

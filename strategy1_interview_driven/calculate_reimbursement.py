@@ -1,17 +1,19 @@
 import sys
 
 DEFAULT_PARAMS = {
-    "per_diem_rate": 71.0531,
-    "mileage_tier1_threshold_miles": 1369.1215,
-    "mileage_tier1_rate": 0.4424,
-    "mileage_tier2_rate": 0.3478,
-    "receipt_reimbursement_rate": 0.4239, # For rounded receipts
-    "five_day_trip_bonus_amount": 27.9537,
-    "mileage_efficiency_threshold_miles_per_day": 110.5237,
-    "mileage_efficiency_bonus_amount": 147.3527,
-    "short_trip_day_threshold": 3,
-    "low_mileage_threshold_miles": 34,
-    "low_reimbursement_multiplier": 1.3979
+    "per_diem_rate": 73.7227,
+    "mileage_t1_threshold_miles": 107.7229,
+    "mileage_t1_rate": 0.6605,
+    "mileage_t2_threshold_miles": 429.7346,
+    "mileage_t2_rate": 0.3057,
+    "mileage_t3_rate": 0.2267,
+    "receipt_reimbursement_rate": 0.4378,
+    "five_day_trip_bonus_amount": 71.1104,
+    "mileage_efficiency_threshold_miles_per_day": 102.6377,
+    "mileage_efficiency_bonus_amount": 111.9857,
+    "short_trip_day_threshold": 2,
+    "low_mileage_threshold_miles": 61,
+    "low_reimbursement_multiplier": 0.7834
 }
 
 def calculate_reimbursement(trip_duration_days, miles_traveled, total_receipts_amount, params=DEFAULT_PARAMS):
@@ -20,15 +22,22 @@ def calculate_reimbursement(trip_duration_days, miles_traveled, total_receipts_a
     # Rule 1: Base Per Diem (Initial)
     per_diem_reimbursement = trip_duration_days * params["per_diem_rate"]
 
-    # Rule 2 & 3: Tiered Mileage Reimbursement
-    # Tier 1: First 100 miles at $0.58/mile
-    # Tier 2: Miles above 100 at $0.29/mile (initial placeholder rate)
+    # Rule 2, 3 & New: 3-Tier Mileage Reimbursement
+    # Tier 1: Up to mileage_t1_threshold_miles (e.g., 100 miles) at mileage_t1_rate (e.g., $0.58/mile)
+    # Tier 2: Miles between mileage_t1_threshold_miles and mileage_t2_threshold_miles (e.g., 100.01 to 500 miles) at mileage_t2_rate (e.g., $0.30/mile)
+    # Tier 3: Miles above mileage_t2_threshold_miles (e.g., >500 miles) at mileage_t3_rate (e.g., $0.20/mile)
     mileage_reimbursement = 0.0
-    if miles_traveled <= params["mileage_tier1_threshold_miles"]:
-        mileage_reimbursement = miles_traveled * params["mileage_tier1_rate"]
-    else:
-        mileage_reimbursement = (params["mileage_tier1_threshold_miles"] * params["mileage_tier1_rate"]) + \
-                                ((miles_traveled - params["mileage_tier1_threshold_miles"]) * params["mileage_tier2_rate"]) 
+    if miles_traveled <= 0: # Handle zero or negative miles explicitly
+        mileage_reimbursement = 0.0
+    elif miles_traveled <= params["mileage_t1_threshold_miles"]:
+        mileage_reimbursement = miles_traveled * params["mileage_t1_rate"]
+    elif miles_traveled <= params["mileage_t2_threshold_miles"]:
+        mileage_reimbursement = (params["mileage_t1_threshold_miles"] * params["mileage_t1_rate"]) + \
+                                ((miles_traveled - params["mileage_t1_threshold_miles"]) * params["mileage_t2_rate"])
+    else: # miles_traveled > params["mileage_t2_threshold_miles"]
+        mileage_reimbursement = (params["mileage_t1_threshold_miles"] * params["mileage_t1_rate"]) + \
+                                ((params["mileage_t2_threshold_miles"] - params["mileage_t1_threshold_miles"]) * params["mileage_t2_rate"]) + \
+                                ((miles_traveled - params["mileage_t2_threshold_miles"]) * params["mileage_t3_rate"]) 
 
     # Rule for Receipts: Flat 20% reimbursement on rounded amount
     # Rule #5: Receipt Rounding Quirks - Apply standard rounding to total_receipts_amount
