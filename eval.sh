@@ -82,7 +82,7 @@ for ((i=0; i<num_cases; i++)); do
     IFS=':' read -r trip_duration miles_traveled receipts_amount expected <<< "${test_cases[i]}"
     
     # Run the user's implementation
-    if script_output=$(./run.sh "$trip_duration" "$miles_traveled" "$receipts_amount" 2>/dev/null); then
+    if script_output=$(./run.sh "$trip_duration" "$miles_traveled" "$receipts_amount"); then
         # Check if output is a valid number
         output=$(echo "$script_output" | tr -d '[:space:]')
         if [[ $output =~ ^-?[0-9]+\.?[0-9]*$ ]]; then
