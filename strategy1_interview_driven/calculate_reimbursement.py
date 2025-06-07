@@ -19,7 +19,8 @@ DEFAULT_PARAMS = {
     "mileage_efficiency_bonus_amount": 139.3399,
     "short_trip_day_threshold": 2,
     "low_mileage_threshold_miles": 93,
-    "low_reimbursement_multiplier": 0.9373
+    "low_reimbursement_multiplier": 0.9373,
+    "receipt_reimbursement_cap_amount": 750.0 # Max amount for receipt reimbursement - manually set
 }
 
 def calculate_reimbursement(trip_duration_days, miles_traveled, total_receipts_amount, params=DEFAULT_PARAMS):
@@ -66,6 +67,9 @@ def calculate_reimbursement(trip_duration_days, miles_traveled, total_receipts_a
         receipt_reimbursement = (params["receipt_t1_threshold_amount"] * params["receipt_t1_rate"]) + \
                                 ((params["receipt_t2_threshold_amount"] - params["receipt_t1_threshold_amount"]) * params["receipt_t2_rate"]) + \
                                 ((rounded_receipts_amount - params["receipt_t2_threshold_amount"]) * params["receipt_t3_rate"])
+
+    # Apply cap to receipt reimbursement
+    receipt_reimbursement = min(receipt_reimbursement, params["receipt_reimbursement_cap_amount"])
 
     total_reimbursement = per_diem_reimbursement + mileage_reimbursement + receipt_reimbursement
 
