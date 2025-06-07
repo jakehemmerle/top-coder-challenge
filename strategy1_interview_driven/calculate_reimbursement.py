@@ -1,19 +1,25 @@
 import sys
+import math
 
 DEFAULT_PARAMS = {
-    "per_diem_rate": 73.7227,
-    "mileage_t1_threshold_miles": 107.7229,
-    "mileage_t1_rate": 0.6605,
-    "mileage_t2_threshold_miles": 429.7346,
-    "mileage_t2_rate": 0.3057,
-    "mileage_t3_rate": 0.2267,
-    "receipt_reimbursement_rate": 0.4378,
-    "five_day_trip_bonus_amount": 71.1104,
-    "mileage_efficiency_threshold_miles_per_day": 102.6377,
-    "mileage_efficiency_bonus_amount": 111.9857,
+    "per_diem_rate": 84.7402,
+    "mileage_t1_threshold_miles": 132.2898,
+    "mileage_t1_rate": 0.5153,
+    "mileage_t2_threshold_miles": 415.7941,
+    "mileage_t2_rate": 0.3304,
+    "mileage_t3_rate": 0.2522,
+    # "receipt_reimbursement_rate": 0.4378, # Replaced by tiered system
+    "receipt_t1_threshold_amount": 524.2149,
+    "receipt_t1_rate": 0.4226,
+    "receipt_t2_threshold_amount": 1185.7473, # Amounts from t1_thresh to t2_thresh are Tier 2
+    "receipt_t2_rate": 0.7472,
+    "receipt_t3_rate": 0.1286, # Amounts above t2_thresh are Tier 3
+    "five_day_trip_bonus_amount": 92.4952,
+    "mileage_efficiency_threshold_miles_per_day": 246.0342,
+    "mileage_efficiency_bonus_amount": 139.3399,
     "short_trip_day_threshold": 2,
-    "low_mileage_threshold_miles": 61,
-    "low_reimbursement_multiplier": 0.7834
+    "low_mileage_threshold_miles": 93,
+    "low_reimbursement_multiplier": 0.9373
 }
 
 def calculate_reimbursement(trip_duration_days, miles_traveled, total_receipts_amount, params=DEFAULT_PARAMS):
@@ -39,12 +45,27 @@ def calculate_reimbursement(trip_duration_days, miles_traveled, total_receipts_a
                                 ((params["mileage_t2_threshold_miles"] - params["mileage_t1_threshold_miles"]) * params["mileage_t2_rate"]) + \
                                 ((miles_traveled - params["mileage_t2_threshold_miles"]) * params["mileage_t3_rate"]) 
 
-    # Rule for Receipts: Flat 20% reimbursement on rounded amount
-    # Rule #5: Receipt Rounding Quirks - Apply standard rounding to total_receipts_amount
-    # This is the best performing model so far (avg error ~$263.76 with 5-day bonus).
-    # Future iterations will explore more complex tiered/capped models based on interview hints.
-    rounded_total_receipts = int(total_receipts_amount + 0.5) # Standard rounding
-    receipt_reimbursement = rounded_total_receipts * params["receipt_reimbursement_rate"]
+    # Receipt Reimbursement - with specific rounding quirks
+    # Based on interview: "If your receipts end in 49 or 99 cents, you often get a little extra money."
+    # This means for .49 or .99 cents, we ceil(); otherwise, we trunc().
+    cents_val = round((total_receipts_amount - math.trunc(total_receipts_amount)) * 100)
+    if cents_val == 49 or cents_val == 99:
+        rounded_receipts_amount = math.ceil(total_receipts_amount)
+    else:
+        rounded_receipts_amount = math.trunc(total_receipts_amount)
+
+    # 3-Tier Receipt Reimbursement
+    if rounded_receipts_amount <= 0:
+        receipt_reimbursement = 0.0
+    elif rounded_receipts_amount <= params["receipt_t1_threshold_amount"]:
+        receipt_reimbursement = rounded_receipts_amount * params["receipt_t1_rate"]
+    elif rounded_receipts_amount <= params["receipt_t2_threshold_amount"]:
+        receipt_reimbursement = (params["receipt_t1_threshold_amount"] * params["receipt_t1_rate"]) + \
+                                ((rounded_receipts_amount - params["receipt_t1_threshold_amount"]) * params["receipt_t2_rate"])
+    else: # Above receipt_t2_threshold_amount
+        receipt_reimbursement = (params["receipt_t1_threshold_amount"] * params["receipt_t1_rate"]) + \
+                                ((params["receipt_t2_threshold_amount"] - params["receipt_t1_threshold_amount"]) * params["receipt_t2_rate"]) + \
+                                ((rounded_receipts_amount - params["receipt_t2_threshold_amount"]) * params["receipt_t3_rate"])
 
     total_reimbursement = per_diem_reimbursement + mileage_reimbursement + receipt_reimbursement
 

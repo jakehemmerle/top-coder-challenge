@@ -26,7 +26,12 @@ PARAMETER_RANGES = {
     "mileage_t2_threshold_miles": [300.0, 700.0, 'float'],
     "mileage_t2_rate": [0.20, 0.40, 'float'],
     "mileage_t3_rate": [0.10, 0.30, 'float'],
-    "receipt_reimbursement_rate": [0.10, 0.50, 'float'],
+    # "receipt_reimbursement_rate": [0.10, 0.50, 'float'], # Replaced by tiered system
+    "receipt_t1_threshold_amount": [400.0, 700.0, 'float'],
+    "receipt_t1_rate": [0.20, 0.60, 'float'],
+    "receipt_t2_threshold_amount": [700.0, 1200.0, 'float'],
+    "receipt_t2_rate": [0.40, 0.80, 'float'], # Potential "sweet spot" rate
+    "receipt_t3_rate": [0.05, 0.30, 'float'], # Diminishing returns rate
     "five_day_trip_bonus_amount": [0.00, 100.00, 'float'],
     "mileage_efficiency_threshold_miles_per_day": [100.0, 400.0, 'float'],
     "mileage_efficiency_bonus_amount": [0.00, 150.00, 'float'],
