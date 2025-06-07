@@ -26,6 +26,10 @@ def calculate_reimbursement(trip_duration_days, miles_traveled, total_receipts_a
 
     total_reimbursement = per_diem_reimbursement + mileage_reimbursement + receipt_reimbursement
 
+    # Rule #4: 5-Day Trip Bonus (Hypothesis)
+    if trip_duration_days == 5:
+        total_reimbursement += 25.00  # Hypothetical fixed bonus amount
+
     return total_reimbursement
 
 if __name__ == "__main__":
