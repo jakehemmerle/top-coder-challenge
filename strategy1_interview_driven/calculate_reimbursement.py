@@ -32,6 +32,15 @@ def calculate_reimbursement(trip_duration_days, miles_traveled, total_receipts_a
     if trip_duration_days == 5:
         total_reimbursement += 25.00  # Hypothetical fixed bonus amount
 
+    # Rule #7: Efficiency Bonus (Mileage Related)
+    # If miles_traveled / trip_duration_days > 150, add $50 bonus
+    if trip_duration_days > 0:
+        miles_per_day = miles_traveled / float(trip_duration_days) # Ensure float division
+        MILEAGE_EFFICIENCY_THRESHOLD = 150.0
+        EFFICIENCY_BONUS_AMOUNT = 50.00
+        if miles_per_day > MILEAGE_EFFICIENCY_THRESHOLD:
+            total_reimbursement += EFFICIENCY_BONUS_AMOUNT
+
     return total_reimbursement
 
 if __name__ == "__main__":
