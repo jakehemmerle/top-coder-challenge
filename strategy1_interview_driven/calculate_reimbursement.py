@@ -19,9 +19,10 @@ def calculate_reimbursement(trip_duration_days, miles_traveled, total_receipts_a
         mileage_reimbursement = (tier1_threshold_miles * tier1_rate) + \
                                 ((miles_traveled - tier1_threshold_miles) * tier2_rate)
 
-    # Rule for Receipts (Initial - direct pass-through)
-    # Diminishing returns, penalties, and quirks will be added iteratively.
-    receipt_reimbursement = total_receipts_amount * 0.20  # Initial guess for percentage-based reimbursement
+    # Rule for Receipts: Flat 20% reimbursement
+    # This is the best performing model so far (avg error ~$265).
+    # Future iterations will explore more complex tiered/capped models based on interview hints.
+    receipt_reimbursement = total_receipts_amount * 0.20
 
     total_reimbursement = per_diem_reimbursement + mileage_reimbursement + receipt_reimbursement
 
